@@ -518,6 +518,7 @@
                                 <span>Multi-Timeframe Signal:</span>
                                 <span class="aligned-signal-value" id="btc-aligned-signal">Neutral</span>
                             </div>
+                            <div class="forecast-path-list" id="btc-path-list" style="margin-top: 1rem; font-size: 0.8rem; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 0.8rem; display: none;"></div>
                         </div>
 
                         <!-- ETH Card -->
@@ -541,6 +542,7 @@
                                 <span>Multi-Timeframe Signal:</span>
                                 <span class="aligned-signal-value" id="eth-aligned-signal">Neutral</span>
                             </div>
+                            <div class="forecast-path-list" id="eth-path-list" style="margin-top: 1rem; font-size: 0.8rem; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 0.8rem; display: none;"></div>
                         </div>
                     </div>
                 </section>
@@ -644,10 +646,15 @@
                     const status = await statusRes.json();
                     const settings = status.current_settings;
                     
-                    document.getElementById('bankroll').value = settings.bankroll;
-                    document.getElementById('kelly-fraction').value = settings.fractional_kelly;
-                    document.getElementById('pred-len').value = settings.prediction_length;
-                    document.getElementById('sample-count').value = settings.sample_count;
+                    const bankrollInput = document.getElementById('bankroll');
+                    const kellyInput = document.getElementById('kelly-fraction');
+                    const predLenInput = document.getElementById('pred-len');
+                    const sampleCountInput = document.getElementById('sample-count');
+                    
+                    if (document.activeElement !== bankrollInput) bankrollInput.value = settings.bankroll;
+                    if (document.activeElement !== kellyInput) kellyInput.value = settings.fractional_kelly;
+                    if (document.activeElement !== predLenInput) predLenInput.value = settings.prediction_length;
+                    if (document.activeElement !== sampleCountInput) sampleCountInput.value = settings.sample_count;
                 }
 
                 // 2. Fetch predictions
@@ -671,6 +678,25 @@
                         document.getElementById('btc-bar-down').style.width = `${(1-p_up)*100}%`;
                         
                         document.getElementById('btc-aligned-signal').innerText = btc.aligned_signal || 'Neutral';
+                        
+                        // Render forecast path list
+                        const btcPathList = document.getElementById('btc-path-list');
+                        if (btc.forecast_path && btc.forecast_path.length > 0) {
+                            btcPathList.style.display = 'block';
+                            btcPathList.innerHTML = '<div style="font-weight: 600; margin-bottom: 0.4rem; color: var(--text-muted);">Forecast Steps:</div>';
+                            btc.forecast_path.forEach(step => {
+                                const timeStr = step.timestamps.split(' ')[1] || step.timestamps;
+                                const directionClass = step.close >= step.open ? 'color: var(--success);' : 'color: var(--danger);';
+                                btcPathList.innerHTML += `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem; background: rgba(255,255,255,0.02); padding: 0.25rem 0.5rem; border-radius: 4px;">
+                                        <span>${timeStr}</span>
+                                        <span style="${directionClass}">$${step.close.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            btcPathList.style.display = 'none';
+                        }
                     }
                     
                     // Render ETH Card
@@ -689,6 +715,25 @@
                         document.getElementById('eth-bar-down').style.width = `${(1-p_up)*100}%`;
                         
                         document.getElementById('eth-aligned-signal').innerText = eth.aligned_signal || 'Neutral';
+                        
+                        // Render forecast path list
+                        const ethPathList = document.getElementById('eth-path-list');
+                        if (eth.forecast_path && eth.forecast_path.length > 0) {
+                            ethPathList.style.display = 'block';
+                            ethPathList.innerHTML = '<div style="font-weight: 600; margin-bottom: 0.4rem; color: var(--text-muted);">Forecast Steps:</div>';
+                            eth.forecast_path.forEach(step => {
+                                const timeStr = step.timestamps.split(' ')[1] || step.timestamps;
+                                const directionClass = step.close >= step.open ? 'color: var(--success);' : 'color: var(--danger);';
+                                ethPathList.innerHTML += `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem; background: rgba(255,255,255,0.02); padding: 0.25rem 0.5rem; border-radius: 4px;">
+                                        <span>${timeStr}</span>
+                                        <span style="${directionClass}">$${step.close.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            ethPathList.style.display = 'none';
+                        }
                     }
                 }
 
