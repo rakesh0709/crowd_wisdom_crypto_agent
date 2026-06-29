@@ -1,0 +1,14 @@
+apify-client==3.0.4
+requests==2.33.0
+pandas==3.0.1
+numpy==2.4.3
+torch==2.12.1
+transformers==5.12.1
+einops==0.8.2
+safetensors==0.8.0
+fastapi==0.135.2
+uvicorn==0.42.0
+pydantic==2.13.4
+python-dotenv==1.2.2
+matplotlib==3.11.0
+git+https://github.com/NousResearch/hermes-agent.git@f53ba9bb5464c5dd821fc387e4479b0d5e0b8a0e
