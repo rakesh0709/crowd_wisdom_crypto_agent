@@ -17,3 +17,6 @@ __pycache__/
 # IDE files
 .vscode/
 .idea/
+
+# Local scratch files
+scratch/
